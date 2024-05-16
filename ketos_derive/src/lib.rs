@@ -135,8 +135,10 @@ pub fn derive_struct_value(input: TokenStream) -> TokenStream {
 fn gen_foreign_value(input: TokenStream) -> Result<TokenStream2, Error> {
     let ast: DeriveInput = syn::parse(input)?;
 
+    let opts = AttrOpts::parse(&ast.attrs)?;
+
     let name = ast.ident;
-    let name_str = name.to_string();
+    let name_str = opts.rename.unwrap_or_else(|| name.to_string());
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
     Ok(quote!{
@@ -149,8 +151,10 @@ fn gen_foreign_value(input: TokenStream) -> Result<TokenStream2, Error> {
 fn gen_from_value(input: TokenStream) -> Result<TokenStream2, Error> {
     let ast: DeriveInput = syn::parse(input)?;
 
+    let opts = AttrOpts::parse(&ast.attrs)?;
+
     let name = ast.ident;
-    let name_str = name.to_string();
+    let name_str = opts.rename.unwrap_or_else(|| name.to_string());
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
     Ok(quote!{
@@ -184,8 +188,10 @@ fn gen_from_value(input: TokenStream) -> Result<TokenStream2, Error> {
 fn gen_from_value_clone(input: TokenStream) -> Result<TokenStream2, Error> {
     let ast: DeriveInput = syn::parse(input)?;
 
+    let opts = AttrOpts::parse(&ast.attrs)?;
+
     let name = ast.ident;
-    let name_str = name.to_string();
+    let name_str = opts.rename.unwrap_or_else(|| name.to_string());
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
     Ok(quote!{
@@ -218,8 +224,10 @@ fn gen_from_value_clone(input: TokenStream) -> Result<TokenStream2, Error> {
 fn gen_from_value_ref(input: TokenStream) -> Result<TokenStream2, Error> {
     let ast: DeriveInput = syn::parse(input)?;
 
+    let opts = AttrOpts::parse(&ast.attrs)?;
+
     let name = ast.ident;
-    let name_str = name.to_string();
+    let name_str = opts.rename.unwrap_or_else(|| name.to_string());
     let (impl_generics, ty_generics, where_clause) = split_with_lifetime(&ast.generics);
 
     Ok(quote!{
@@ -241,6 +249,8 @@ fn gen_from_value_ref(input: TokenStream) -> Result<TokenStream2, Error> {
 fn gen_struct_value(input: TokenStream) -> Result<TokenStream2, Error> {
     let ast: DeriveInput = syn::parse(input)?;
 
+    let opts = AttrOpts::parse(&ast.attrs)?;
+
     let span = ast.ident.span();
     let name = ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
@@ -260,7 +270,7 @@ fn gen_struct_value(input: TokenStream) -> Result<TokenStream2, Error> {
             return Err(Error::new(span, "cannot derive StructValue for union types")),
     };
 
-    let name_str = name.to_string();
+    let name_str = opts.rename.unwrap_or_else(|| name.to_string());
     let mut local = Vec::new();
     let mut field_name = Vec::new();
     let mut field_str = Vec::new();
